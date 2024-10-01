@@ -1,0 +1,55 @@
+version: '3.1'
+
+services:
+  nginx:
+    build: ./requirements/nginx
+    depends_on:
+      - wordpress
+    volumes:
+      - wodpress_v:/var/www/html
+    container_name: nginx
+    image: nginx
+    extra_hosts:
+      - "abouregb.42.fr:127.0.0.1"
+    ports:
+      - 443:443
+    env_file:
+      - .env
+
+  mariadb:
+    build: ./requirements/mariadb
+    container_name: mariadb
+    image: mariadb
+    volumes:
+      - mariadb_v:/var/lib/mysql
+    ports:
+      - 3306:3306
+    restart: always
+    env_file:
+      - .env
+
+  wordpress:
+    build: ./requirements/wordpress
+    depends_on:
+      - mariadb
+    container_name: wordpress
+    image: wordpress
+    volumes:
+      - wodpress_v:/var/www/html
+    ports:
+      - 9000:9000
+    restart: always
+    env_file:
+      - .env
+
+volumes:
+  wodpress_v:
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/ahmed/data/wordpress
+  mariadb_v:
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/ahmed/data/mariadb
